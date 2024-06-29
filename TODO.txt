@@ -1,0 +1,11 @@
+reddit picture scraper
+
+- project for the creation of the dataset 
+- connect reddit picture Scraper with Twitter - NSFW Webscraper (main project)
+
+INPUT: 
+    - one or multiple title .txt file with list of subreddits + number of pictures downloaded for each subreddit (default is maybe 40% of top posts)
+
+1. get picture links of post with photos ==> save them under picturelinks_title.txt (maybe create a own dir)
+2. downloading each photo by link or whole picture list
+3. Save picture in own dir with title
