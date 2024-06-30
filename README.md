@@ -1,6 +1,3 @@
-Certainly! Here's the README content written in markdown format that you can directly copy and save as `README.md`:
-
-```markdown
 # Reddit Picture Scraper
 
 ## Introduction
