@@ -35,7 +35,7 @@ python main.py
 ```
 
 You will be prompted to provide:
-- Path to a file containing subreddit links.
+- Path to a file containing subreddit links (in the format used by old Reddit).
 - Number of pictures to download per subreddit (default is 25).
 - Path where the downloaded pictures should be saved.
 
