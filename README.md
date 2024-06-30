@@ -8,8 +8,6 @@ The Reddit Picture Scraper is a Python application designed to fetch and downloa
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Installation
 
