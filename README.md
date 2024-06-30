@@ -16,8 +16,8 @@ To install and run the Reddit Picture Scraper, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your/repository.git
-   cd repository
+   git clone https://github.com/skeund89/reddit-picture-scraper.git
+   cd reddit-picture-scraper
    ```
 
 2. Install dependencies using pip:
