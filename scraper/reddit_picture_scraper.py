@@ -48,7 +48,3 @@ class pictureScraper:
                 print(f"Picture {image_path} from {link} got downloaded.")
             except Exception as err:
                 print(err)
-
-if __name__ == "__main__":
-    rps = pictureScraper()
-    rps.fetch_imagelinks("https://old.reddit.com/r/pics/")
