@@ -1,8 +1,7 @@
 import os
-import requests
+import time
 import re
-from bs4 import BeautifulSoup
-import selenium
+from selenium import webdriver
 import urllib
 
 class pictureScraper:
@@ -17,21 +16,27 @@ class pictureScraper:
     
     def fetch_imagelinks(self, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
         extraced_links = []
-        req = requests.get(subreddit_link)
-        parser = BeautifulSoup(req.content, "html.parser")
-
-        thumbnail_tag = parser.find_all('a', class_='thumbnail')
         
-        # Extracts and collects valid image URLs from 'thumbnail_tag'
-        for tag in thumbnail_tag[:number_images]:
-            image_url = tag.get('href')
+        driver = webdriver.Safari()
+        driver.get(subreddit_link)
 
-            if image_url != None:
-                print(image_url)
-                extraced_links.append(image_url)
+        SCROLL_PAUSE_TIME = 0.5
+        while len(extraced_links) < number_images:
+            thumbnail_elements = driver.find_elements_by_css_selector('a.thumbnail')
 
-        print(f"Found in {subreddit_link} {len(extraced_links)} pictures.")
+            for element in thumbnail_elements:
+                link = element.get_attributes("href")
+                
+                if link not in extraced_links:
+                    extraced_links.append(link)
+            
+                if link >= extraced_links:
+                    break
+            
+            driver.execute_script("return document.body.scrollHeight")
+            time.sleep(SCROLL_PAUSE_TIME)
         
+        driver.close()
         return extraced_links
 
     def downloading_imagelinks(self, image_links: list[str], output_path: str) -> None: # downloads every picture
