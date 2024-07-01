@@ -1,5 +1,9 @@
 # Reddit Picture Scraper
 
+## Important Note
+
+When requesting the subreddit link, only the first 20 posts (or a similar limited number) are loaded by default. Therefore, only these posts can be scraped unless additional loading mechanisms are implemented.
+
 ## Introduction
 
 The Reddit Picture Scraper is a Python application designed to fetch and download images from specified subreddits. It utilizes web scraping techniques to extract image URLs from Reddit's HTML structure and downloads them to a local directory specified by the user.
