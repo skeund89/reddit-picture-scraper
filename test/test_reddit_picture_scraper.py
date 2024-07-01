@@ -50,3 +50,11 @@ class pictureScraper:
                 print(f"Picture {image_path} from {link} got downloaded.")
             except Exception as err:
                 print(f"Picture {image_path} from {link} couldnt get downloaded.\nError: {err}")
+
+if __name__ == "__main__":
+    rps = pictureScraper()
+    links = rps.read_file("test/subreddit_links.txt")
+    
+    for link in links:
+        extracted_links = rps.fetch_imagelinks(link)
+        rps.downloading_imagelinks(extracted_links, "test")
