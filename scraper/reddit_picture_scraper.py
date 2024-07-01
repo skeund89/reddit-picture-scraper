@@ -29,6 +29,8 @@ class pictureScraper:
                 print(image_url)
                 extraced_links.append(image_url)
 
+        print(f"Found in {subreddit_link} {len(extraced_links)} pictures.")
+        
         return extraced_links
 
     def downloading_imagelinks(self, image_links: list[str], output_path: str) -> None: # downloads every picture
@@ -47,4 +49,4 @@ class pictureScraper:
                 urllib.request.urlretrieve(link, image_path)
                 print(f"Picture {image_path} from {link} got downloaded.")
             except Exception as err:
-                print(err)
+                print(f"Picture {image_path} from {link} couldnt get downloaded.\nError: {err}")
