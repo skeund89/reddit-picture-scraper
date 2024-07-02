@@ -1,7 +1,10 @@
 import os
-import requests
+import time
 import re
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import urllib
 
 class pictureScraper:
@@ -16,21 +19,33 @@ class pictureScraper:
     
     def fetch_imagelinks(self, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
         extraced_links = []
-        req = requests.get(subreddit_link)
-        parser = BeautifulSoup(req.content, "html.parser")
-
-        thumbnail_tag = parser.find_all('a', class_='thumbnail')
         
-        # Extracts and collects valid image URLs from 'thumbnail_tag'
-        for tag in thumbnail_tag[:number_images]:
-            image_url = tag.get('href')
+        driver = webdriver.Safari()
+        driver.get(subreddit_link)
 
-            if image_url != None:
-                print(image_url)
-                extraced_links.append(image_url)
+        NEXTPAGE_BUTTON_PATH = "//div[@class='nav-buttons']//a[text()='Weiter ›']"
+        while len(extraced_links) < number_images:
+            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, NEXTPAGE_BUTTON_PATH)))
+            thumbnail_elements = driver.find_elements(By.CSS_SELECTOR, 'a.thumbnail')
+            
+            for element in thumbnail_elements:
+                link = element.get_attribute("href")
+                
+                if link not in extraced_links:
+                    extraced_links.append(link)
+            
+                if len(extraced_links) >= number_images:
+                    break
+                    
+            try:
+                nextPage_button = driver.find_element(By.XPATH, NEXTPAGE_BUTTON_PATH)
+            except Exception as err:
+                print(err)
+                return err
+            finally:
+                driver.execute_script("arguments[0].click();", nextPage_button)
 
-        print(f"Found in {subreddit_link} {len(extraced_links)} pictures.")
-        
+        driver.close()
         return extraced_links
 
     def downloading_imagelinks(self, image_links: list[str], output_path: str) -> None: # downloads every picture
@@ -53,8 +68,5 @@ class pictureScraper:
 
 if __name__ == "__main__":
     rps = pictureScraper()
-    links = rps.read_file("test/subreddit_links.txt")
-    
-    for link in links:
-        extracted_links = rps.fetch_imagelinks(link)
-        rps.downloading_imagelinks(extracted_links, "test")
+    extracted_links = rps.fetch_imagelinks("https://old.reddit.com/r/pics/", 100)
+    rps.downloading_imagelinks(extracted_links, "test/")
