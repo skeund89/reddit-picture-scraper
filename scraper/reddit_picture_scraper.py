@@ -2,6 +2,7 @@ import os
 import time
 import re
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,9 +18,11 @@ class pictureScraper:
         
         return links
     
-    def fetch_imagelinks(self, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
+    def fetch_imagelinks(self, proxy: None, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
         extraced_links = []
-        
+        options = Options()
+        options.add_argument(f"--proxy-server={proxy}")
+
         driver = webdriver.Safari()
         driver.get(subreddit_link)
 
