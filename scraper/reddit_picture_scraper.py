@@ -1,11 +1,17 @@
 import os
 import time
 import re
+from typing import Literal, get_args
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.safari.options import Options as SafariOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import urllib
+
+webdriver_TYPES = Literal["Safari", "Chrome", "Firefox"]
 
 class pictureScraper:
     def __init__(self) -> None:
@@ -17,10 +23,24 @@ class pictureScraper:
         
         return links
     
-    def fetch_imagelinks(self, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
+    def fetch_imagelinks(self, webdriver_option: webdriver_TYPES, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
         extraced_links = []
         
-        driver = webdriver.Safari()
+        options = get_args(webdriver_TYPES)
+        assert webdriver_option in options, f"'{webdriver_option}' is not an option, only Safari, Chrome and Firefox."
+
+        if webdriver_option == "Safari":
+            option = SafariOptions()
+            driver = webdriver.Safari(option)
+
+        elif webdriver_option == "Chrome":
+            option = ChromeOptions()
+            driver = webdriver.Chrome(option)
+
+        elif webdriver_option == "Firefox": 
+            option = FirefoxOptions()
+            driver = webdriver.Firefox(option)
+
         driver.get(subreddit_link)
 
         NEXTPAGE_BUTTON_PATH = "//div[@class='nav-buttons']//a[text()='Weiter ›']"
