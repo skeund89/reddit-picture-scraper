@@ -2,6 +2,9 @@ import os
 import time
 import re
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import urllib
 
 class pictureScraper:
@@ -20,22 +23,28 @@ class pictureScraper:
         driver = webdriver.Safari()
         driver.get(subreddit_link)
 
-        SCROLL_PAUSE_TIME = 0.5
+        NEXTPAGE_BUTTON_PATH = "//div[@class='nav-buttons']//a[text()='Weiter ›']"
         while len(extraced_links) < number_images:
-            thumbnail_elements = driver.find_elements_by_css_selector('a.thumbnail')
-
+            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, NEXTPAGE_BUTTON_PATH)))
+            thumbnail_elements = driver.find_elements(By.CSS_SELECTOR, 'a.thumbnail')
+            
             for element in thumbnail_elements:
-                link = element.get_attributes("href")
+                link = element.get_attribute("href")
                 
                 if link not in extraced_links:
                     extraced_links.append(link)
             
-                if link >= extraced_links:
+                if len(extraced_links) >= number_images:
                     break
-            
-            driver.execute_script("return document.body.scrollHeight")
-            time.sleep(SCROLL_PAUSE_TIME)
-        
+                    
+            try:
+                nextPage_button = driver.find_element(By.XPATH, NEXTPAGE_BUTTON_PATH)
+            except Exception as err:
+                print(err)
+                return err
+            finally:
+                driver.execute_script("arguments[0].click();", nextPage_button)
+
         driver.close()
         return extraced_links
 
@@ -56,3 +65,8 @@ class pictureScraper:
                 print(f"Picture {image_path} from {link} got downloaded.")
             except Exception as err:
                 print(f"Picture {image_path} from {link} couldnt get downloaded.\nError: {err}")
+
+if __name__ == "__main__":
+    rps = pictureScraper()
+    extracted_links = rps.fetch_imagelinks("https://old.reddit.com/r/pics/", 100)
+    print(extracted_links)
