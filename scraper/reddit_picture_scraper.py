@@ -3,6 +3,7 @@ import time
 import re
 from typing import Literal, get_args
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.safari.options import Options as SafariOptions
@@ -23,23 +24,22 @@ class pictureScraper:
         
         return links
     
-    def fetch_imagelinks(self, webdriver_option: webdriver_TYPES, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
+    def fetch_imagelinks(self, webdriver_option: webdriver_TYPES, proxy: None, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
         extraced_links = []
-        
         options = get_args(webdriver_TYPES)
         assert webdriver_option in options, f"'{webdriver_option}' is not an option, only Safari, Chrome and Firefox."
 
+        options = Options()
+        options.add_argument(f"--proxy-server={proxy}")
+
         if webdriver_option == "Safari":
-            option = SafariOptions()
-            driver = webdriver.Safari(option)
+            driver = webdriver.Safari(options)
 
         elif webdriver_option == "Chrome":
-            option = ChromeOptions()
-            driver = webdriver.Chrome(option)
+            driver = webdriver.Chrome(options)
 
         elif webdriver_option == "Firefox": 
-            option = FirefoxOptions()
-            driver = webdriver.Firefox(option)
+            driver = webdriver.Firefox(options)
 
         driver.get(subreddit_link)
 
