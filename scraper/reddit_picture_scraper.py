@@ -2,6 +2,7 @@ import os
 import time
 import re
 from typing import Literal, get_args
+import selenium
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.options import Options as ChromeOptions
@@ -30,7 +31,9 @@ class pictureScraper:
         assert webdriver_option in options, f"'{webdriver_option}' is not an option, only Safari, Chrome and Firefox."
 
         options = Options()
-        options.add_argument(f"--proxy-server={proxy}")
+
+        if proxy != None:
+            options.add_argument(f"--proxy-server={proxy}")
 
         if webdriver_option == "Safari":
             driver = webdriver.Safari(options)
@@ -45,7 +48,7 @@ class pictureScraper:
 
         NEXTPAGE_BUTTON_PATH = "//div[@class='nav-buttons']//a[text()='Weiter ›']"
         while len(extraced_links) < number_images:
-            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, NEXTPAGE_BUTTON_PATH)))
+            WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, NEXTPAGE_BUTTON_PATH)))
             thumbnail_elements = driver.find_elements(By.CSS_SELECTOR, 'a.thumbnail')
             
             for element in thumbnail_elements:
@@ -57,6 +60,7 @@ class pictureScraper:
                 if len(extraced_links) >= number_images:
                     break
                     
+            time.sleep(1)
             try:
                 nextPage_button = driver.find_element(By.XPATH, NEXTPAGE_BUTTON_PATH)
             except Exception as err:
@@ -88,5 +92,5 @@ class pictureScraper:
 
 if __name__ == "__main__":
     rps = pictureScraper()
-    extracted_links = rps.fetch_imagelinks("https://old.reddit.com/r/pics/", 100)
+    extracted_links = rps.fetch_imagelinks(proxy=None, subreddit_link="https://old.reddit.com/r/pics/", number_images=100)
     print(extracted_links)
