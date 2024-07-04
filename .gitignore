@@ -157,5 +157,8 @@ cython_debug/
 # System-specific files
 .DS_Store
 
+# content in test/output_images removing
+test/output_images/*
+
 # for owner
 TODO.txt
