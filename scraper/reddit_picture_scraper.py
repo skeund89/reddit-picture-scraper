@@ -78,8 +78,12 @@ class pictureScraper:
         for link in image_links:
             # Extract the matching part from the link and construct the full image path
             match = re.search(pattern, link)
-            if match:
-                jpg_part = match.group(1)
+            
+            if match == None:
+                print(f"No match found in {link}. Continuing with the next link.")
+                continue
+                
+            jpg_part = match.group(1)
             
             image_path = os.path.join(output_path, jpg_part) 
 
