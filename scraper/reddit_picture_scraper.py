@@ -74,10 +74,11 @@ class pictureScraper:
 
     def downloading_imagelinks(self, image_links: list[str], output_path: str) -> None: # downloads every picture
         pattern = r'(?<=\/)([^\/]+\.(jpg|jpeg|png))$'
+        regexObj = re.compile(pattern)
 
         for link in image_links:
             # Extract the matching part from the link and construct the full image path
-            match = re.search(pattern, link)
+            match = regexObj.search(link)
             
             if match == None:
                 print(f"No match found in {link}. Continuing with the next link.")
