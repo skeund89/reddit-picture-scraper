@@ -16,11 +16,13 @@ if __name__ == "__main__":
     file_path = args.inputpath
     quantity = args.quantity
     output_path = args.outputpath
-    driver = args.driver
+    driver_option = args.driver
     proxy = args.proxy
 
     subreddits = rps.read_file(file_path)
+    driver = rps.setup_driver(driver_option, proxy)
     
     for subreddit_link in subreddits:
-        imagelinks = rps.fetch_imagelinks(driver, proxy, subreddit_link, quantity)
+        print(f"\nStarting with {subreddit_link}.\n")
+        imagelinks = rps.fetch_imagelinks(driver, subreddit_link, quantity)
         rps.downloading_imagelinks(imagelinks, output_path)

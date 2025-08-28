@@ -24,12 +24,11 @@ class pictureScraper:
             links = [line.rstrip() for line in file]
         
         return links
-    
-    def fetch_imagelinks(self, webdriver_option: webdriver_TYPES, proxy: None, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
-        extraced_links = []
+
+    def setup_driver(self, webdriver_option: webdriver_TYPES, proxy: None) -> webdriver:
         options = get_args(webdriver_TYPES)
         assert webdriver_option in options, f"'{webdriver_option}' is not an option, only Safari, Chrome and Firefox."
-
+        
         options = Options()
 
         if proxy != None:
@@ -44,8 +43,12 @@ class pictureScraper:
         elif webdriver_option == "Firefox": 
             driver = webdriver.Firefox(options)
 
+        return driver
+
+    def fetch_imagelinks(self, driver: webdriver, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
         driver.get(subreddit_link)
 
+        extraced_links = []
         NEXTPAGE_BUTTON_PATH = "//div[@class='nav-buttons']//a[text()='Weiter ›']"
         while len(extraced_links) < number_images:
             WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, NEXTPAGE_BUTTON_PATH)))
@@ -97,5 +100,6 @@ class pictureScraper:
 
 if __name__ == "__main__":
     rps = pictureScraper()
-    extracted_links = rps.fetch_imagelinks(proxy=None, subreddit_link="https://old.reddit.com/r/pics/", number_images=100)
+    driver = rps.setup_driver("Safari", None)
+    extracted_links = rps.fetch_imagelinks(driver=driver, subreddit_link="https://old.reddit.com/r/pics/", number_images=100)
     print(extracted_links)
