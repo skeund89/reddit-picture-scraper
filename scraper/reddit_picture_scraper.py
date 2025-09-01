@@ -45,23 +45,38 @@ class pictureScraper:
 
         return driver
 
-    def fetch_imagelinks(self, driver: webdriver, subreddit_link: str, number_images: int = 25) -> list[str]: # scrapes links of pictures of the given subreddit link 
+    def fetch_imagelinks(self, driver: webdriver, subreddit_link: str, number_images: int = 25) -> list[(str,str)]: # scrapes links of pictures of the given subreddit link 
         driver.get(subreddit_link)
 
-        extraced_links = []
+        # create regex oject with pattern 
+        pattern = r'(?<=\/)([^\/]+\.(jpg|jpeg|png))$'
+        regexObj = re.compile(pattern)
+
+        extracted_links = [] # Structure of the extraced_link array: [(full link, jpg part), ...]
         NEXTPAGE_BUTTON_PATH = "//div[@class='nav-buttons']//a[text()='Weiter ›']"
-        while len(extraced_links) < number_images:
+        while len(extracted_links) < number_images:
             WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, NEXTPAGE_BUTTON_PATH)))
             thumbnail_elements = driver.find_elements(By.CSS_SELECTOR, 'a.thumbnail')
             
             for element in thumbnail_elements:
                 link = element.get_attribute("href")
                 
-                if link not in extraced_links:
-                    extraced_links.append(link)
-            
-                if len(extraced_links) >= number_images:
+                if len(extracted_links) >= number_images:
                     break
+
+                if link not in {t[0] for t in extracted_links}:
+                    #Extract matching part from the link with regex
+                    match = regexObj.search(link)
+
+                    #TODO: Check if href link is even a image link, href links are also used for arctiles etc.
+                    if match == None:
+                        print(f"No match found in {link} due to various reasons. Continuing with the next link.")
+                        continue
+
+                    jpp_part = match.group(1)
+                    print(f"Image link {link} of {element} with the jpg part {jpp_part} was found.")
+
+                    extracted_links.append((link, jpp_part))
                     
             time.sleep(1)
             try:
@@ -73,22 +88,11 @@ class pictureScraper:
                 driver.execute_script("arguments[0].click();", nextPage_button)
 
         driver.close()
-        return extraced_links
+        return extracted_links
 
-    def downloading_imagelinks(self, image_links: list[str], output_path: str) -> None: # downloads every picture
-        pattern = r'(?<=\/)([^\/]+\.(jpg|jpeg|png))$'
-        regexObj = re.compile(pattern)
+    def downloading_imagelinks(self, image_links: list[(str,str)], output_path: str) -> None: # downloads every picture
+        for link, jpg_part in image_links:
 
-        for link in image_links:
-            # Extract the matching part from the link and construct the full image path
-            match = regexObj.search(link)
-            
-            if match == None:
-                print(f"No match found in {link}. Continuing with the next link.")
-                continue
-                
-            jpg_part = match.group(1)
-            
             image_path = os.path.join(output_path, jpg_part) 
 
             # Downloads the pictures 
@@ -101,5 +105,6 @@ class pictureScraper:
 if __name__ == "__main__":
     rps = pictureScraper()
     driver = rps.setup_driver("Safari", None)
-    extracted_links = rps.fetch_imagelinks(driver=driver, subreddit_link="https://old.reddit.com/r/pics/", number_images=100)
-    print(extracted_links)
+    extracted_links = rps.fetch_imagelinks(driver=driver, subreddit_link="https://old.reddit.com/r/pics/", number_images=25)
+    print(f"\n{extracted_links}\n")
+    rps.downloading_imagelinks(extracted_links, "test/output_images")
