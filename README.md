@@ -73,7 +73,7 @@ The script performs the following steps:
 The input file containing subreddit links should have one link per line, for example:
 
 ```
-https://old.reddit.com/r/pics/
-https://old.reddit.com/r/aww/
-https://old.reddit.com/r/funny/
+https://old.reddit.com/r/pics/, 25
+https://old.reddit.com/r/aww/, 25
+https://old.reddit.com/r/funny/, 25
 ```
