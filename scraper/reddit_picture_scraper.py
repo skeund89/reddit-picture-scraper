@@ -19,10 +19,14 @@ class pictureScraper:
     def __init__(self) -> None:
         pass
 
-    def read_file(self, file_path: str) -> list[str]: # reads every link in file in a list
-        with open(file_path) as file:
-            links = [line.rstrip() for line in file]
+    def read_file(self, file_path: str) -> list[(str, int)]: # reads every link in file in a list
+        links = []
         
+        with open(file_path) as file:              
+            for line in file:
+                link, quantity = re.split(", |,", line, 1)
+                links.append((link, int(quantity)))
+
         return links
 
     def setup_driver(self, webdriver_option: webdriver_TYPES, proxy: None) -> webdriver:
@@ -104,7 +108,9 @@ class pictureScraper:
 
 if __name__ == "__main__":
     rps = pictureScraper()
+    links = rps.read_file("test/subreddit_links.txt")
     driver = rps.setup_driver("Safari", None)
-    extracted_links = rps.fetch_imagelinks(driver=driver, subreddit_link="https://old.reddit.com/r/pics/", number_images=25)
+
+    extracted_links = rps.fetch_imagelinks(driver=driver, subreddit_link="https://old.reddit.com/r/pics/", number_images=200)
     print(f"\n{extracted_links}\n")
-    rps.downloading_imagelinks(extracted_links, "test/output_images")
+    # rps.downloading_imagelinks(extracted_links, "test/output_images")
